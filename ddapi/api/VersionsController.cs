@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-
+using Microsoft.AspNetCore.Authorization;
+ 
 namespace api.Services;
 
 [ApiController]
@@ -32,6 +33,7 @@ public sealed class VersionsController : ControllerBase
             return StatusCode(500, "Failed gettings versions");
         }
     }
+
 
     [HttpGet("{versionID}")]
     public async Task<IActionResult> GetVersionInfo(string versionID)
@@ -84,25 +86,28 @@ public sealed class VersionsController : ControllerBase
             return StatusCode(500, $"Failed editing version: {e}");
         }
     }
-    
+
+    [Authorize]
     [HttpPost("edit_id")]
     public async Task<IActionResult> EditVersionID(string versionID, string newVersionID)
         => await EditVersion(versionID, (i) => i.ID = newVersionID);
     
+    [Authorize]
     [HttpPost("edit_name")]
     public async Task<IActionResult> EditVersionName(string versionID, string newName)
         => await EditVersion(versionID, (i) => i.Name = newName);
 
-    
+    [Authorize]    
     [HttpPost("edit_tag")]
     public async Task<IActionResult> EditVersionTag(string versionID, string newTag)
         => await EditVersion(versionID, (i) => i.Tag = newTag);
 
-    
+    [Authorize]
     [HttpPost("edit_changelog")]
     public async Task<IActionResult> EditVersionChangelog(string versionID, string newChangelog)
         => await EditVersion(versionID, (i) => i.Changelog = newChangelog);
-    
+
+    [Authorize]
     [HttpPost("upload")]
     public async Task<IActionResult> PostVersion(string versionID, string name, string tag, IFormFile file, string changelog)
     {
@@ -126,6 +131,7 @@ public sealed class VersionsController : ControllerBase
         }
     }
     
+    [Authorize]    
     [HttpPost("delete")]
     public async Task<IActionResult> DeleteVersion(string versionID)
     {

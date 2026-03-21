@@ -1,4 +1,6 @@
 using api.Services;
+using Microsoft.AspNetCore.Authentication;
+using api.Services.Auth;
 
 public static class DDAPI
 {
@@ -17,9 +19,19 @@ public static class DDAPI
             .AddControllers()
             .AddApplicationPart(typeof(VersionsController).Assembly);
 
+
+	builder.Services.AddAuthentication("PanelAuthentication")
+	    .AddScheme<AuthenticationSchemeOptions, PanelAuthenticationHandler>("PanelAuthentication", null);
+
+	builder.Services.AddAuthorization();
+		
         WebApplication app = builder.Build();
 
+	app.UseAuthentication();
+	app.UseAuthorization();
+	
         app.MapControllers();
+	
         app.Run();
     }
 }

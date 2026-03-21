@@ -22,9 +22,29 @@ public sealed class DatabaseController : IDatabaseReader, IDatabaseWriter
         Config = config;
     }
 
-    public Task<bool> ValidateUserAuth(string username, string password)
+    public async Task<bool> ValidateUserAuth(string username, string password)
     {
-        throw new NotImplementedException();
+
+        using (SqliteConnection connection = new SqliteConnection($"Data Source={Config.DatabasePath}"))
+        {
+            await connection.OpenAsync();
+            using (SqliteCommand command = new SqliteCommand($"SELECT * FROM users WHERE username = '{username}'", connection))
+	    {		
+	        using (SqliteDataReader reader = await command.ExecuteReaderAsync())
+		{
+		    bool valid = await reader.ReadAsync();
+
+		    if(valid)
+		    {
+			return true;
+		    }
+		    else
+		    {
+			return false;
+		    }		
+		}
+	    }	
+	}	
     }
 
     public async Task<VersionInfo> ReadVersionInfo(string id)

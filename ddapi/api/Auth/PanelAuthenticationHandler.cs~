@@ -6,9 +6,10 @@ using Microsoft.Extensions.Options;
 
 namespace api.Services.Auth;
 
-public class AuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
+public class PanelAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
-    private readonly IConfig Config;
+    private readonly IConfig         Config;
+    private readonly IDatabaseReader Reader;
 
     public AuthenticationHandler(
         IConfig config,
@@ -51,7 +52,13 @@ public class AuthenticationHandler : AuthenticationHandler<AuthenticationSchemeO
         var username = credentials[0];
         var password = credentials[1];
 
-        
-        return AuthenticateResult.Success(null);
+	bool valid = await Reader.ValidateUserAuth(username, password);
+	
+	if(valid)
+	{
+	    return AuthenticateResult.Success(null);	    
+	}
+
+	return AuthenticateResult.Fail("Invalid username or password");
     }
 }

@@ -12,4 +12,30 @@
     <PackageReference Include="Npgsql" Version="10.0.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="**/.*" />
+    <Compile Remove="**/.*.cs" />
+    <Compile Remove="**/.#*" />
+    <Compile Remove="**/*~" />
+    <Compile Remove="**/*.swp" />
+    <Compile Remove="**/*.swo" />
+    <Compile Remove="**/*.bak" />
+    
+    <!-- Also exclude from being copied to output -->
+    <None Remove="**/.*" />
+    <None Remove="**/.#*" />
+    <None Remove="**/*~" />
+    <None Remove="**/*.swp" />
+    <None Remove="**/*.swo" />
+    <None Remove="**/*.bak" />
+    
+    <!-- Don't include them as content -->
+    <Content Remove="**/.*" />
+    <Content Remove="**/.#*" />
+    <Content Remove="**/*~" />
+    <Content Remove="**/*.swp" />
+    <Content Remove="**/*.swo" />
+    <Content Remove="**/*.bak" />
+  </ItemGroup>
+
 </Project>
