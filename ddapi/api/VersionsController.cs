@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Services;
@@ -59,6 +60,46 @@ public sealed class VersionsController : ControllerBase
         {
             Console.WriteLine(e);
             return StatusCode(500, $"Failed getting version: {versionID}");
+        }
+    }
+    
+    [HttpPost("edit")]
+    public async Task<IActionResult> EditVersion(string versionID, IFormFile file, string changelog)
+    {
+        if (!file.FileName.EndsWith(".zip") && !file.FileName.EndsWith(".tar.gz"))
+        {
+            return StatusCode(500, $"Invalid file extension");
+        }
+
+        try
+        {
+            await VersionsService.SaveOnDiskAndRegister(file, versionID, changelog);
+            return Ok();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Failed uploading version: {e}");
+            return StatusCode(500, $"Failed uploading version: {e}");
+        }
+    }
+    
+    [HttpPost("upload")]
+    public async Task<IActionResult> PostVersion(string versionID, IFormFile file, string changelog)
+    {
+        if (!file.FileName.EndsWith(".zip") && !file.FileName.EndsWith(".tar.gz"))
+        {
+            return StatusCode(500, $"Invalid file extension");
+        }
+
+        try
+        {
+            await VersionsService.SaveOnDiskAndRegister(file, versionID, changelog);
+            return Ok();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Failed uploading version: {e}");
+            return StatusCode(500, $"Failed uploading version: {e}");
         }
     }
 }
