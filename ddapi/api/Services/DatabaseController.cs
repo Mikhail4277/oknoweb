@@ -27,7 +27,7 @@ public sealed class DatabaseController : IDatabaseReader, IDatabaseWriter
         await using (SqliteConnection connection = new SqliteConnection($"Data Source={Config.DatabasePath}"))
         {
             await connection.OpenAsync();
-            await using (SqliteCommand command = new SqliteCommand($"SELECT * FROM users WHERE username = '{username}', password = '{password}'", connection))
+            await using (SqliteCommand command = new SqliteCommand($"SELECT * FROM users WHERE username = '{username}' and password = '{password}'", connection))
 	        {
                 await using (SqliteDataReader reader = await command.ExecuteReaderAsync())
 		        {

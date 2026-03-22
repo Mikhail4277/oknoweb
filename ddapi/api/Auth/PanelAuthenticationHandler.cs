@@ -28,20 +28,20 @@ public class PanelAuthenticationHandler : AuthenticationHandler<AuthenticationSc
     {
         if (!Request.Headers.ContainsKey("Authorization"))
         {
-	    Console.WriteLine("No authorization header");
+			Console.WriteLine("No authorization header");
             return AuthenticateResult.Fail("No authorization header");
         }
 
         string authorizationHeader = Request.Headers["Authorization"];
         if (string.IsNullOrEmpty(authorizationHeader))
         {
-	    Console.WriteLine("Invalid header. Empty");
+			Console.WriteLine("Invalid header. Empty");
             return AuthenticateResult.Fail("Invalid header. Empty");
         }
 
         if (!authorizationHeader.StartsWith("basic ", StringComparison.OrdinalIgnoreCase))
         {
-	    Console.WriteLine("Invalid header. Basic auth required");
+			Console.WriteLine("Invalid header. Basic auth required");
             return AuthenticateResult.Fail("Invalid header. Basic auth required");
         }
 
@@ -51,29 +51,28 @@ public class PanelAuthenticationHandler : AuthenticationHandler<AuthenticationSc
         var credentials = credentialAsString.Split(":");
         if (credentials?.Length != 2)
         {
-	    Console.WriteLine("Invalid arguments in username:password");
+			Console.WriteLine("Invalid arguments in username:password");
             return AuthenticateResult.Fail("Invalid arguments in username:password");
         }
         
         var username = credentials[0];
         var password = credentials[1];
 
-	bool valid = await Reader.ValidateUserAuth(username, password);
+		bool valid = await Reader.ValidateUserAuth(username, password);
 	
-	if(valid)
-	{
-	    
-	    var claims = new[]
-	    {
-		new Claim(ClaimTypes.NameIdentifier, username)
-	    };
-	    
-	    var identity = new ClaimsIdentity(claims, "Basic");
-	    var claimsPrincipal = new ClaimsPrincipal(identity);
-	
-	    return AuthenticateResult.Success(new AuthenticationTicket(claimsPrincipal, Scheme.Name));	    
-	}
+		if(valid)
+		{
+		    var claims = new[]
+		    {
+				new Claim(ClaimTypes.NameIdentifier, username)
+		    };
+		    
+		    var identity = new ClaimsIdentity(claims, "Basic");
+		    var claimsPrincipal = new ClaimsPrincipal(identity);
+		
+		    return AuthenticateResult.Success(new AuthenticationTicket(claimsPrincipal, Scheme.Name));	    
+		}
 
-	return AuthenticateResult.Fail("Invalid username or password");
+		return AuthenticateResult.Fail("Invalid username or password");
     }
 }
