@@ -24,27 +24,17 @@ public sealed class DatabaseController : IDatabaseReader, IDatabaseWriter
 
     public async Task<bool> ValidateUserAuth(string username, string password)
     {
-
-        using (SqliteConnection connection = new SqliteConnection($"Data Source={Config.DatabasePath}"))
+        await using (SqliteConnection connection = new SqliteConnection($"Data Source={Config.DatabasePath}"))
         {
             await connection.OpenAsync();
-            using (SqliteCommand command = new SqliteCommand($"SELECT * FROM users WHERE username = '{username}'", connection))
-	    {		
-	        using (SqliteDataReader reader = await command.ExecuteReaderAsync())
-		{
-		    bool valid = await reader.ReadAsync();
-
-		    if(valid)
-		    {
-			return true;
-		    }
-		    else
-		    {
-			return false;
-		    }		
-		}
+            await using (SqliteCommand command = new SqliteCommand($"SELECT * FROM users WHERE username = '{username}', password = '{password}'", connection))
+	        {
+                await using (SqliteDataReader reader = await command.ExecuteReaderAsync())
+		        {
+		            return await reader.ReadAsync();
+		        }
+	        }	
 	    }	
-	}	
     }
 
     public async Task<VersionInfo> ReadVersionInfo(string id)
