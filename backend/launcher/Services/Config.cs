@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using System.Text.Json;
 
 namespace api.Services;
@@ -14,10 +13,8 @@ public sealed class Config : IConfig
     public string ChangelogColumn   => "changelog";
     public string ReleaseDateColumn => "release_date";
 
-    public string DatabasePath { get; private set; }
-
-    public string ArchiveMainPath { get; private set; }
-    public string ArchiveModsPath { get; private set; }
+    public string DatabasePath       { get; private set; }
+    public string VersionArchivePath { get; private set; }
 
     private readonly string RootPath;
 
@@ -27,13 +24,9 @@ public sealed class Config : IConfig
         RootPath = RootPath.Replace("\n", "");
 
         DatabasePath    = Path.Combine(RootPath, "database.db");
-        ArchiveMainPath = Path.Combine(RootPath, "versions_archive", "main");
-        ArchiveModsPath = Path.Combine(RootPath, "versions_archive", "mods");
         
         ValidatePath(RootPath);
         ValidatePath(DatabasePath);
-        ValidatePath(ArchiveMainPath);
-        ValidatePath(ArchiveModsPath);
     }
 
     private void ValidatePath(string path)

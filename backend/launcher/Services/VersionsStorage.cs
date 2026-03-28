@@ -25,13 +25,20 @@ public sealed class VersionsStorage : IVersionsStorage
     {
         try
         {
-            string path = Path.Combine(Config.ArchiveMainPath, id + ".zip");
+            string dir = Path.Combine(Config.VersionArchivePath, tag);
+
+            if (!Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+            
+            string path = Path.Combine(dir, id + ".zip");
 
             if (File.Exists(path))
             {
                 File.Delete(path);
             }
-
+            
             await using (var stream = File.Create(path))
             {
                 await formFile.CopyToAsync(stream);
@@ -55,6 +62,8 @@ public sealed class VersionsStorage : IVersionsStorage
 	        return;
 	    }
 	    
-	    File.Delete(info.Path);		
+	    File.Delete(info.Path);
+        
+        //we actually can check if tag directory is empty now and delete it too
     }
 }

@@ -9,8 +9,6 @@ public interface IConfig
     public string ChangelogColumn   { get; }
     public string ReleaseDateColumn { get; }
     
-    public string DatabasePath      { get; }
-    
-    public string ArchiveMainPath   { get; }
-    public string ArchiveModsPath   { get; }
+    public string DatabasePath       { get; }
+    public string VersionArchivePath { get; }
 }

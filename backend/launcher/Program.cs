@@ -12,10 +12,10 @@ public static class DDAPI
         
         builder.WebHost.ConfigureKestrel(options => options.Limits.MaxRequestBodySize = 200 * 1024 * 1024);
         
-        builder.Services.AddScoped<IConfig,          Config>();
-        builder.Services.AddScoped<IDatabaseReader,  DatabaseController>();
-        builder.Services.AddScoped<IDatabaseWriter,  DatabaseController>();
-        builder.Services.AddScoped<IVersionsStorage, VersionsStorage>();
+        builder.Services.AddSingleton<IConfig,          Config>();
+        builder.Services.AddSingleton<IDatabaseReader,  DatabaseController>();
+        builder.Services.AddSingleton<IDatabaseWriter,  DatabaseController>();
+        builder.Services.AddSingleton<IVersionsStorage, VersionsStorage>();
         
         builder.Services
             .AddControllers()
