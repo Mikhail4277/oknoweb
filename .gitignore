@@ -1,6 +1,12 @@
-/ddapi/database.db
-/ddapi/versions_archive
-/ddapi/api/obj
-/ddapi/api/bin
-/ddapi/api/Properties
-/ddapi/api/Properties
+#build stuff
+/backend/launcher/obj
+/backend/launcher/bin
+
+#dotnet configs
+/backend/launcher/Properties
+
+#data
+/data/
+
+#ide
+/launcher/.idea

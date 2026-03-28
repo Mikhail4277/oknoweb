@@ -1,10 +1,11 @@
+using System.Runtime.InteropServices;
 using System.Text.Json;
 
 namespace api.Services;
 
 public sealed class Config : IConfig
 {
-    public const string CONFIG_PATH = "/home/destructive_crab/dev/okno/web/oknoweb/ddapi/config";
+    public string CONFIG_PATH => Path.Combine(Directory.GetCurrentDirectory(), "config");
     
     public string IDColumn          => "id";
     public string NameColumn        => "name";
