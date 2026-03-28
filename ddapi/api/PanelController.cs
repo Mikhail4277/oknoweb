@@ -13,28 +13,53 @@ public sealed class PanelController : ControllerBase
 
     public PanelController(IVersionsStorage storage, IDatabaseWriter writer, IDatabaseReader reader)
     {
-	Storage = storage;
-	Writer  = writer;
-	Reader  = reader;
+	    Storage = storage;
+	    Writer  = writer;
+	    Reader  = reader;
     }
 
-    [HttpPost("edit_id")]
+    [HttpPost("versions/{versionID}/id")]
     public async Task<IActionResult> EditVersionID(string versionID, string newVersionID)
-        => await EditVersion(versionID, (i) => i.ID = newVersionID);
+        => await EditVersion(versionID, (i) => i.PublicInfo.ID = newVersionID);
     
-    [HttpPost("edit_name")]
+    [HttpPost("versions/{versionID}/name")]
     public async Task<IActionResult> EditVersionName(string versionID, string newName)
-        => await EditVersion(versionID, (i) => i.Name = newName);
+        => await EditVersion(versionID, (i) => i.PublicInfo.Name = newName);
 
-    [HttpPost("edit_tag")]
+    [HttpPost("versions/{versionID}/tag")]
     public async Task<IActionResult> EditVersionTag(string versionID, string newTag)
-        => await EditVersion(versionID, (i) => i.Tag = newTag);
+        => await EditVersion(versionID, (i) => i.PublicInfo.Tag = newTag);
 
-    [HttpPost("edit_changelog")]
+    [HttpPost("versions/{versionID}/changelog")]
     public async Task<IActionResult> EditVersionChangelog(string versionID, string newChangelog)
-        => await EditVersion(versionID, (i) => i.Changelog = newChangelog);
+        => await EditVersion(versionID, (i) => i.PublicInfo.Changelog = newChangelog);
+    
+    [HttpPost("files/{versionID}")]
+    public async Task<IActionResult> EditVersionFile(string versionID, IFormFile file)
+    {
+        try
+        {
+            bool valid = await Reader.ValidateVersionID(versionID);
 
-    [HttpPost("upload")]
+            if (!valid)
+            {
+                return StatusCode(400, "Invalid id");
+            }
+
+            LocalVersionInfo info = await Reader.ReadVersionInfo(versionID);
+        
+            await Storage.WriteVersionOnDisk(file, versionID, info.PublicInfo.Tag);
+
+            return Ok();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(500, "Failed uploading new version file");
+        }
+    }
+
+    [HttpPost("versions/{versionID}")]
     public async Task<IActionResult> PostVersion(string versionID, string name, string tag, IFormFile file, string changelog)
     {
         if (!file.FileName.EndsWith(".zip") && !file.FileName.EndsWith(".tar.gz"))
@@ -46,7 +71,7 @@ public sealed class PanelController : ControllerBase
         {
             string path = await Storage.WriteVersionOnDisk(file, versionID, tag);
 
-            Writer.RegisterVersion(new VersionInfo(versionID, path, name, tag, changelog, DateTime.Today.Date.ToString()));
+            Writer.RegisterVersion(new LocalVersionInfo(new(versionID, name, tag, changelog, DateTime.Today.Date.ToString()),  path));
             
             return Ok();
         }
@@ -57,32 +82,33 @@ public sealed class PanelController : ControllerBase
         }
     }
     
-    [HttpPost("delete")]
-    public async Task<IActionResult> DeleteVersion(string versionID)
+    [HttpDelete("versions/{id}")]
+    public async Task<IActionResult> DeleteVersion(string id)
     {
         try
         {
-            await Writer .DeleteVersion(versionID);
-	    await Storage.DeleteVersionFile(versionID);
-	    
+            await Storage.DeleteVersionFile(id);
+            await Writer .DeleteVersion(id);
+
             return Ok();
         }
         catch (Exception e)
         {
-            Console.WriteLine($"Failed deleting {versionID}  " + e.ToString());
+            Console.WriteLine($"Failed deleting {id}  " + e.ToString());
             return StatusCode(500, $"Failed deleting version: {e}");
         }
     }
     
-    private async Task<IActionResult> EditVersion(string versionID, Action<VersionInfo> editInfo)
+    private async Task<IActionResult> EditVersion(string versionID, Action<LocalVersionInfo> editInfo)
     {
         try
         {
-            VersionInfo info = await Reader.ReadVersionInfo(versionID);
+            LocalVersionInfo info = await Reader.ReadVersionInfo(versionID);
             
             editInfo.Invoke(info);
             
             await Writer.EditVersion(versionID, info);
+            
             return Ok();
         }
         catch (Exception e)

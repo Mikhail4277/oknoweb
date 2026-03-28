@@ -2,7 +2,8 @@ namespace api.Services;
 
 public interface IDatabaseReader
 {
-    Task<bool>          ValidateUserAuth(string username, string password);
-    Task<VersionInfo>   ReadVersionInfo(string id);
-    Task<VersionInfo[]> ReadAllVersionsInfo();
+    Task<bool>                ValidateUserAuth    (string username, string password);
+    Task<bool>                ValidateVersionID   (string id);
+    Task<LocalVersionInfo>    ReadVersionInfo     (string id);
+    Task<LocalVersionInfo[]>  ReadAllVersionsInfo ();
 }

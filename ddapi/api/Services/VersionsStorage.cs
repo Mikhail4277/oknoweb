@@ -16,7 +16,7 @@ public sealed class VersionsStorage : IVersionsStorage
 
     public async Task<FileStream> GetVersionFile(string versionId)
     {
-        VersionInfo info = await Reader.ReadVersionInfo(versionId);
+        LocalVersionInfo info = await Reader.ReadVersionInfo(versionId);
 
         return new FileStream(info.Path, FileMode.Open, FileAccess.Read);
     }
@@ -26,8 +26,13 @@ public sealed class VersionsStorage : IVersionsStorage
         try
         {
             string path = Path.Combine(Config.ArchiveMainPath, id + ".zip");
-            
-            using (var stream = File.Create(path))
+
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+
+            await using (var stream = File.Create(path))
             {
                 await formFile.CopyToAsync(stream);
             }
@@ -43,13 +48,13 @@ public sealed class VersionsStorage : IVersionsStorage
 
     public async Task DeleteVersionFile(string id)
     {
-	VersionInfo info = await Reader.ReadVersionInfo(id);
-
-	if(info == null)
-	{
-	    return;
-	}
-	
-	File.Delete(info.Path);		
+	    LocalVersionInfo info = await Reader.ReadVersionInfo(id);
+    
+	    if(info == null)
+	    {
+	        return;
+	    }
+	    
+	    File.Delete(info.Path);		
     }
 }

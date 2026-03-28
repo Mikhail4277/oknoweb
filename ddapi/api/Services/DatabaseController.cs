@@ -6,15 +6,16 @@ public sealed class DatabaseController : IDatabaseReader, IDatabaseWriter
 {
     private readonly IConfig Config;
 
-    private VersionInfo CreateInfoFromReader(SqliteDataReader reader)
+    private LocalVersionInfo CreateInfoFromReader(SqliteDataReader reader)
     {
-        return new VersionInfo(
-            reader[Config.IDColumn]          as string,
-            reader[Config.PathColumn]        as string,
-            reader[Config.NameColumn]        as string,
-            reader[Config.TagColumn]         as string,
-            reader[Config.ChangelogColumn]   as string,
-            reader[Config.ReleaseDateColumn] as string);
+        return new LocalVersionInfo(
+            new(reader[Config.IDColumn]          as string,
+                reader[Config.NameColumn]        as string,
+                reader[Config.TagColumn]         as string,
+                reader[Config.ChangelogColumn]   as string,
+                reader[Config.ReleaseDateColumn] as string),
+            reader[Config.PathColumn] as string
+            );
     }
 
     public DatabaseController(IConfig config)
@@ -37,15 +38,31 @@ public sealed class DatabaseController : IDatabaseReader, IDatabaseWriter
 	    }	
     }
 
-    public async Task<VersionInfo> ReadVersionInfo(string id)
+    public async Task<bool> ValidateVersionID(string id)
     {
-        using (SqliteConnection connection = new SqliteConnection($"Data Source={Config.DatabasePath}"))
+        await using (SqliteConnection connection = new SqliteConnection($"Data Source={Config.DatabasePath}"))
         {
             await connection.OpenAsync();
 
-            using (SqliteCommand command = new SqliteCommand($"SELECT * FROM main WHERE id = '{id}'", connection))
+            await using (SqliteCommand command = new SqliteCommand($"SELECT EXISTS(SELECT 1 FROM main WHERE id = '{id}')", connection))
             {
-                using (SqliteDataReader reader = await command.ExecuteReaderAsync())
+                object? result = await command.ExecuteScalarAsync();
+                int count = Convert.ToInt32(result);
+
+                return count == 1;
+            }
+        }
+    }
+
+    public async Task<LocalVersionInfo> ReadVersionInfo(string id)
+    {
+        await using (SqliteConnection connection = new SqliteConnection($"Data Source={Config.DatabasePath}"))
+        {
+            await connection.OpenAsync();
+
+            await using (SqliteCommand command = new SqliteCommand($"SELECT * FROM main WHERE id = '{id}'", connection))
+            {
+                await using (SqliteDataReader reader = await command.ExecuteReaderAsync())
                 {
                     bool valid = await reader.ReadAsync();
 
@@ -62,9 +79,9 @@ public sealed class DatabaseController : IDatabaseReader, IDatabaseWriter
         }
     }
 
-    public async Task<VersionInfo[]> ReadAllVersionsInfo()
+    public async Task<LocalVersionInfo[]> ReadAllVersionsInfo()
     {
-        List<VersionInfo> infos = new();
+        List<LocalVersionInfo> infos = new();
 
         await using (SqliteConnection connection = new SqliteConnection($"Data Source={Config.DatabasePath}"))
         {
@@ -85,7 +102,7 @@ public sealed class DatabaseController : IDatabaseReader, IDatabaseWriter
         return infos.ToArray();
     }
 
-    public async Task RegisterVersion(VersionInfo info)
+    public async Task RegisterVersion(LocalVersionInfo info)
     {
         await using (SqliteConnection connection = new SqliteConnection($"Data Source={Config.DatabasePath}"))
         {
@@ -95,19 +112,19 @@ public sealed class DatabaseController : IDatabaseReader, IDatabaseWriter
 
             await using (SqliteCommand command = new(insertCommand, connection))
             {
-                command.Parameters.AddWithValue("@id", info.ID);
-                command.Parameters.AddWithValue("@path", info.Path);
-                command.Parameters.AddWithValue("@name", info.Name);
-                command.Parameters.AddWithValue("@tag", info.Tag);
-                command.Parameters.AddWithValue("@changelog", info.Changelog);
-                command.Parameters.AddWithValue("@release_date", info.ReleaseDate);
+                command.Parameters.AddWithValue("@id",           info.PublicInfo.ID);
+                command.Parameters.AddWithValue("@name",         info.PublicInfo.Name);
+                command.Parameters.AddWithValue("@path",         info.Path);
+                command.Parameters.AddWithValue("@tag",          info.PublicInfo.Tag);
+                command.Parameters.AddWithValue("@changelog",    info.PublicInfo.Changelog);
+                command.Parameters.AddWithValue("@release_date", info.PublicInfo.ReleaseDate);
 
                 await command.ExecuteNonQueryAsync();        
             }
         }
     }
 
-    public async Task EditVersion(string versionID, VersionInfo info)
+    public async Task EditVersion(string versionID, LocalVersionInfo info)
     {
         await using (SqliteConnection connection = new SqliteConnection($"Data Source={Config.DatabasePath}"))
         {
@@ -119,21 +136,18 @@ public sealed class DatabaseController : IDatabaseReader, IDatabaseWriter
 
             await using (SqliteCommand command = new(editCommand, connection))
             {
-                command.Parameters.Add("@id",           SqliteType.Text).Value = info.ID;
+                command.Parameters.Add("@id",           SqliteType.Text).Value = info.PublicInfo.ID;
                 command.Parameters.Add("@path",         SqliteType.Text).Value = info.Path;
-                command.Parameters.Add("@name",         SqliteType.Text).Value = info.Name;
-                command.Parameters.Add("@tag",          SqliteType.Text).Value = info.Tag;
-                command.Parameters.Add("@changelog",    SqliteType.Text).Value = info.Changelog;
-                command.Parameters.Add("@release_date", SqliteType.Text).Value = info.ReleaseDate;
+                command.Parameters.Add("@name",         SqliteType.Text).Value = info.PublicInfo.Name;
+                command.Parameters.Add("@tag",          SqliteType.Text).Value = info.PublicInfo.Tag;
+                command.Parameters.Add("@changelog",    SqliteType.Text).Value = info.PublicInfo.Changelog;
+                command.Parameters.Add("@release_date", SqliteType.Text).Value = info.PublicInfo.ReleaseDate;
 
-                Console.WriteLine(command.CommandText);
-                Console.WriteLine(" ");
-                
                 await command.ExecuteNonQueryAsync();                
             }
         }
     }
-    
+
     public async Task DeleteVersion(string id)
     {
         await using (SqliteConnection connection = new SqliteConnection($"Data Source={Config.DatabasePath}"))

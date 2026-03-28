@@ -1,11 +1,10 @@
-using System.Net.Mime;
 using Microsoft.AspNetCore.Mvc;
 using api.Services;
 
 namespace api.Controllers;
 
 [ApiController]
-[Route("api/versions")]
+[Route("api/")]
 public sealed class VersionsController : ControllerBase
 {
     private readonly IVersionsStorage Storage;
@@ -17,14 +16,21 @@ public sealed class VersionsController : ControllerBase
         Reader = reader;
     }
 
-    [HttpGet("all")]
+    [HttpGet("versions")]
     public async Task<IActionResult> GetVersionsInfo()
     {
         try
         {
-            VersionInfo[] vis = await Reader.ReadAllVersionsInfo();
+            LocalVersionInfo[]  vis         = await Reader.ReadAllVersionsInfo();
+            PublicVersionInfo[] pubVersions = new PublicVersionInfo[vis.Length];
+
+            for (int i = 0; i < vis.Length; i++)
+            {
+                pubVersions[i] = vis[i].PublicInfo;
+            }
+
             Console.WriteLine($"Versions requested. Sending {vis.Length} versions info");
-            return Ok(vis);
+            return Ok(pubVersions);
         }
         catch (Exception e)
         {
@@ -34,14 +40,14 @@ public sealed class VersionsController : ControllerBase
     }
 
 
-    [HttpGet("{versionID}")]
+    [HttpGet("versions/{versionID}")]
     public async Task<IActionResult> GetVersionInfo(string versionID)
     {
         try
         {
             Console.WriteLine($"Version {versionID} requested");
             
-            VersionInfo ver = await Reader.ReadVersionInfo(versionID);
+            PublicVersionInfo ver = (await Reader.ReadVersionInfo(versionID)).PublicInfo;
 
             return Ok(ver);
         }
@@ -52,7 +58,7 @@ public sealed class VersionsController : ControllerBase
         }
     }
 
-    [HttpGet("download/{versionID}")]
+    [HttpGet("files/{versionID}")]
     public async Task<IActionResult> DownloadVersion(string versionID)
     {
         try
