@@ -21,9 +21,10 @@ public sealed class Config : IConfig
     public Config()
     {
         RootPath        = File.ReadAllText(CONFIG_PATH);
-        RootPath = RootPath.Replace("\n", "");
+        RootPath        = RootPath.Replace("\n", "");
 
-        DatabasePath    = Path.Combine(RootPath, "database.db");
+        DatabasePath       = Path.Combine(RootPath, "database.db");
+        VersionArchivePath = Path.Combine(RootPath, "versions_archive");
         
         ValidatePath(RootPath);
         ValidatePath(DatabasePath);
