@@ -22,23 +22,23 @@ public sealed class PanelController : ControllerBase
     }
 
     [HttpPost("{versionID}/id")]
-    public async Task<IActionResult> EditVersionID(string versionID, string newVersionID)
+    public async Task<IActionResult> EditVersionID(string versionID, [FromForm] string newVersionID)
         => await EditVersion(versionID, (i) => i.PublicInfo.ID = newVersionID);
     
     [HttpPost("{versionID}/name")]
-    public async Task<IActionResult> EditVersionName(string versionID, string newName)
+    public async Task<IActionResult> EditVersionName(string versionID, [FromForm] string newName)
         => await EditVersion(versionID, (i) => i.PublicInfo.Name = newName);
 
     [HttpPost("{versionID}/tag")]
-    public async Task<IActionResult> EditVersionTag(string versionID, string newTag)
+    public async Task<IActionResult> EditVersionTag(string versionID, [FromForm] string newTag)
         => await EditVersion(versionID, (i) => i.PublicInfo.Tag = newTag);
 
     [HttpPost("versions/{versionID}/changelog")]
-    public async Task<IActionResult> EditVersionChangelog(string versionID, string newChangelog)
+    public async Task<IActionResult> EditVersionChangelog(string versionID, [FromForm] string newChangelog)
         => await EditVersion(versionID, (i) => i.PublicInfo.Changelog = newChangelog);
     
     [HttpPost("files/{versionID}")]
-    public async Task<IActionResult> EditVersionFile(string versionID, IFormFile file)
+    public async Task<IActionResult> EditVersionFile(string versionID, [FromForm] IFormFile file)
     {
         try
         {
@@ -63,7 +63,7 @@ public sealed class PanelController : ControllerBase
     }
 
     [HttpPost("{versionID}")]
-    public async Task<IActionResult> PostVersion(string versionID, string name, string tag, IFormFile file, string changelog)
+    public async Task<IActionResult> PostVersion(string versionID, [FromForm] string name, [FromForm] string tag, [FromForm] IFormFile file, [FromForm] string changelog)
     {
         if (!file.FileName.EndsWith(".zip") && !file.FileName.EndsWith(".tar.gz"))
         {
