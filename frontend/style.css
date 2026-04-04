@@ -7,23 +7,6 @@ div{
   text-align:justify;
   letter-spacing: 1px;
 }
-/* Set default spacing for everything */
-* {
-    letter-spacing: 0.02em;  /* Your desired Latin spacing */
-}
-/* Set default spacing for everything */
-* {
-    letter-spacing: 0.02em;  /* Your desired Latin spacing */
-}
-/* Target a specific language or use a class */
-:lang(ru) {
-    letter-spacing: -7px; /* Adjust this value until it matches */
-}
-
-/* Target a specific language or use a class */
-:lang(en) {
-    letter-spacing: 1px; /* Adjust this value until it matches */
-}
 
 body {
     font-family: MS Gothic;
