@@ -1,51 +1,38 @@
 @font-face {
-    font-family: MS Gothic; 
+    font-family: "0xProto";
     src: url('fonts/0xproto.ttf') format('truetype');
-	font-display: swap; /* Improves perceived performance */
+    font-display: swap; /* Improves perceived performance */
 }
 div{
-  text-align:justify;
-  letter-spacing: 1px;
+    text-align:justify;
+    letter-spacing: 1px;
 }
 
 body {
-    font-family: 'MS Gothic';
-	letter-spacing: 1px;
+    font-family: '0xProto';
+    letter-spacing: 1px;
 }
 
-.center {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  width: 50%;
-}
-/* Three image containers (use 25% for four, and 50% for two, etc) */
-.column {
-  float: left;
-  width: 30%;
-  padding: 10px;	
-}
-
-/* Clear floats after image containers */
-.row::after {
-  content: "";
-  clear: both;
-  display: table;
+.logo {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
 }
 
 .button {
-  border: 2px solid #000555;
-  background-color: #ffffff;  
-  color: #000555;
-  padding: 8px 12px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 32px;
-  margin: 4px 2px;
-  cursor: pointer;
-  width: 330px; 
-  height: 60px;
+    border: 2px solid #000555;
+    background-color: #ffffff;
+    color: #000555;
+    padding: 8px 12px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 32px;
+    margin: 4px 2px;
+    cursor: pointer;
+    width: 330px;
+    height: 60px;
 }
 
 .button:hover {
@@ -54,22 +41,16 @@ body {
     background-color: #000555;
 }
 
-.button-row {
-	display: flex;
-	justify-content: center; 
-	gap: 10px;
-}
-/* Base class for all Nerd Font icons */
 .nf {
-	font-family: 'MS Gothic', monospace;
-	font-style: normal;
-	font-weight: normal;
-	font-variant: normal;
-	text-transform: none;
-	line-height: 1;
-	display: inline-block;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
+    font-family: '0xProto', monospace;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    display: inline-block;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 .hover-outline {
@@ -80,8 +61,8 @@ body {
     padding-top: 10px;
     padding-right: 10px;
     padding-left: 10px;
-    width: 100%; 
-    box-sizing: border-box; 
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .hover-outline:hover {
@@ -91,24 +72,4 @@ body {
 h1{
     padding: 5px;
     margin: 0px;
-}
-.image-wrapper {
-    width: 200px;
-    height: 200px;
-    overflow: visible;
-    position: relative;
-}
-
-.image-wrapper img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-    display: block;
-}
-
-.image-wrapper img:hover {
-    transform: scale(1.3);
-    z-index: 100;
-    position: relative;
 }
