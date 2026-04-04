@@ -1,6 +1,6 @@
 @font-face {
     font-family: MS Gothic; 
-    src: url('fonts/msgothic.ttf') format('truetype');
+    src: url('fonts/0xproto.ttf') format('truetype');
 	font-display: swap; /* Improves perceived performance */
 }
 div{
@@ -9,7 +9,7 @@ div{
 }
 
 body {
-    font-family: MS Gothic;
+    font-family: 'MS Gothic';
 	text-align:justify;
 	letter-spacing: 1px;
 }
@@ -41,20 +41,23 @@ body {
   border: 2px solid #000555;
   background-color: #ffffff;  
   color: #000555;
-  padding: 8px 64px;
+  padding: 8px 12px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
   font-size: 32px;
   margin: 4px 2px;
   cursor: pointer;
-  width: 350px; 
+  width: 330px; 
   height: 60px;
-  button:hover {
-        background-color: #0056b3;  /* Darker on hover */
-        border-color: #000555;
-  }
 }
+
+.button:hover {
+    color: #ffffff;
+    border-color: #000555;
+    background-color: #000555;
+}
+
 .button-row {
 	display: flex;
 	justify-content: center;  /* Centers the row */
